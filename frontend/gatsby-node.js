@@ -1,16 +1,17 @@
-/**
- * Implement Gatsby's Node APIs in this file.
- *
- * See: https://www.gatsbyjs.com/docs/node-apis/
- */
-
-// You can delete this file if you're not using it
 exports.createPages = async ({ graphql, actions }) => {
   const { createPage } = actions;
   const result = await graphql(
     `
       {
         articles: allStrapiArticle {
+          edges {
+            node {
+              strapiId
+              slug
+            }
+          }
+        }
+        categories: allStrapiCategory {
           edges {
             node {
               strapiId
@@ -28,6 +29,7 @@ exports.createPages = async ({ graphql, actions }) => {
 
   // Create blog articles pages.
   const articles = result.data.articles.edges;
+  const categories = result.data.categories.edges;
 
   const ArticleTemplate = require.resolve("./src/templates/article.js");
 
@@ -37,6 +39,18 @@ exports.createPages = async ({ graphql, actions }) => {
       component: ArticleTemplate,
       context: {
         slug: article.node.slug,
+      },
+    });
+  });
+
+  const CategoryTemplate = require.resolve("./src/templates/category.js");
+
+  categories.forEach((category, index) => {
+    createPage({
+      path: `/category/${category.node.slug}`,
+      component: CategoryTemplate,
+      context: {
+        slug: category.node.slug,
       },
     });
   });

@@ -704,7 +704,7 @@ module.exports.onCreateNode = async ({ node, actions, createNodeId }) => {
 ```
 28. Faire à la racine de frontend : `yarn add react-markdown react-moment moment`
 
-29.  Créer un fichier `article.js` dans le dossier `src/templates`, coller dedans : 
+29.  Créer un fichier `article.js` dans le dossier `src/templates` (templates doit être aussi créé), coller dedans : 
 ```
 import React from "react";
 import { graphql } from "gatsby";
@@ -798,3 +798,162 @@ const Article = ({ data }) => {
 
 export default Article;
 ```
+
+30. Fermer le terminal du front (pas besoin pour le back) , et redémarrer le serveur en faisant yarn start à la racine de frontend. Vérifier si tout roule.
+
+31. On va créer les catégories, il va falloir pour celà écraser (encore !) le contenu du fichier `gatsby-node.js`. Remplacer par ce code : 
+```
+exports.createPages = async ({ graphql, actions }) => {
+  const { createPage } = actions;
+  const result = await graphql(
+    `
+      {
+        articles: allStrapiArticle {
+          edges {
+            node {
+              strapiId
+              slug
+            }
+          }
+        }
+        categories: allStrapiCategory {
+          edges {
+            node {
+              strapiId
+              slug
+            }
+          }
+        }
+      }
+    `
+  );
+
+  if (result.errors) {
+    throw result.errors;
+  }
+
+  // Create blog articles pages.
+  const articles = result.data.articles.edges;
+  const categories = result.data.categories.edges;
+
+  const ArticleTemplate = require.resolve("./src/templates/article.js");
+
+  articles.forEach((article, index) => {
+    createPage({
+      path: `/article/${article.node.slug}`,
+      component: ArticleTemplate,
+      context: {
+        slug: article.node.slug,
+      },
+    });
+  });
+
+  const CategoryTemplate = require.resolve("./src/templates/category.js");
+
+  categories.forEach((category, index) => {
+    createPage({
+      path: `/category/${category.node.slug}`,
+      component: CategoryTemplate,
+      context: {
+        slug: category.node.slug,
+      },
+    });
+  });
+};
+
+module.exports.onCreateNode = async ({ node, actions, createNodeId }) => {
+  const crypto = require(`crypto`);
+
+  if (node.internal.type === "StrapiArticle") {
+    const newNode = {
+      id: createNodeId(`StrapiArticleContent-${node.id}`),
+      parent: node.id,
+      children: [],
+      internal: {
+        content: node.content || " ",
+        type: "StrapiArticleContent",
+        mediaType: "text/markdown",
+        contentDigest: crypto
+          .createHash("md5")
+          .update(node.content || " ")
+          .digest("hex"),
+      },
+    };
+    actions.createNode(newNode);
+    actions.createParentChildLink({
+      parent: node,
+      child: newNode,
+    });
+  }
+};
+```
+
+32. créer dans le dossier templates, à cotés de article.js, un fichier `category.js` contenante ce code : 
+```
+import React from "react";
+import { graphql } from "gatsby";
+import ArticlesComponent from "../components/articles";
+import Layout from "../components/layout";
+
+export const query = graphql`
+  query Category($slug: String!) {
+    articles: allStrapiArticle(
+      filter: { status: { eq: "published" }, category: { slug: { eq: $slug } } }
+    ) {
+      edges {
+        node {
+          slug
+          title
+          category {
+            name
+          }
+          image {
+            childImageSharp {
+              fixed(width: 660) {
+                src
+              }
+            }
+          }
+          author {
+            name
+            picture {
+              childImageSharp {
+                fixed(width: 30, height: 30) {
+                  ...GatsbyImageSharpFixed
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    category: strapiCategory(slug: { eq: $slug }) {
+      name
+    }
+  }
+`;
+
+const Category = ({ data }) => {
+  const articles = data.articles.edges;
+  const category = data.category.name;
+  const seo = {
+    metaTitle: category,
+    metaDescription: `All ${category} articles`,
+  };
+
+  return (
+    <Layout seo={seo}>
+      <div className="uk-section">
+        <div className="uk-container uk-container-large">
+          <h1>{category}</h1>
+          <ArticlesComponent articles={articles} />
+        </div>
+      </div>
+    </Layout>
+  );
+};
+
+export default Category;
+```
+
+Redémarrer le serveur front end, les catégories devraient être maintenant fonctionnelles. 
