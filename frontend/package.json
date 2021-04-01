@@ -17,10 +17,13 @@
     "gatsby-source-filesystem": "^3.1.0",
     "gatsby-source-strapi": "^0.0.12",
     "gatsby-transformer-sharp": "^3.1.0",
+    "moment": "^2.29.1",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-helmet": "^6.1.0",
+    "react-markdown": "^5.0.3",
+    "react-moment": "^1.1.1",
     "uikit": "^3.6.18"
   },
   "devDependencies": {

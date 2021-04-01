@@ -80,7 +80,7 @@ module.exports = {
 Enregistrer le fichier et fermer.
 
 19. Ouvrir dans le dossier frontend le terminal, lancer cette commande :
-`yarn add uikit && add @fontsource/staatliches && add gatsby-plugin && add gatsby-image && yarn add 'babel-preset-gatsby'`
+`yarn add uikit && add @fontsource/staatliches && add gatsby-plugin && add gatsby-image && yarn add 'babel-preset-gatsby' && yarn add react-markdown react-moment moment`
 
 20. Editer le fichier `seo.js` se trouvant dans `src/components/` . Ecraser le texte à l'intérieur et le remplacer par ce copier coller :
 
@@ -387,6 +387,8 @@ c. Ouvrir localhost:8000 et normalement une page blance avec écrit MY BLOG s'af
 
 Pensez à réactiver votre backend et front end avec yarn start dans les deux dossier et deux terminaux différents ouverts en parallèles.
 
+## Nav component 
+
 22. Création du nav component. Créer un fichier à cet emplacement du frontend : `./src/components/nav.js` , contenant : 
 ```
 import React from "react";
@@ -458,4 +460,341 @@ import Nav from "./nav";
 et rajouter en dessous de la balise `<Seo seo={seo}=>` (entre la ligne 24 et 25 normalement) :
 `<Nav />`
 
-***si vous souhaitez voir le résultat, vous pouvez faire le `yarn start` dans votre dossier frontend, et afficher localhost:8080***
+***si vous souhaitez voir le résultat, vous pouvez faire le `yarn start` dans votre dossier frontend, et afficher localhost:8080, vous derviez avoir Strapi Blog et catégories d'affichier en haut de la page***
+
+## Articles
+
+24. Remplacer le contenu entier du fichier `pages/index.js` du frontend par :
+```
+import React from "react";
+import { graphql, useStaticQuery } from "gatsby";
+import Layout from "../components/layout";
+import ArticlesComponent from "../components/articles";
+import "../assets/css/main.css";
+
+const IndexPage = () => {
+  const data = useStaticQuery(query);
+
+  return (
+    <Layout seo={data.strapiHomepage.seo}>
+      <div className="uk-section">
+        <div className="uk-container uk-container-large">
+          <h1>{data.strapiHomepage.hero.title}</h1>
+          <ArticlesComponent articles={data.allStrapiArticle.edges} />
+        </div>
+      </div>
+    </Layout>
+  );
+};
+
+const query = graphql`
+  query {
+    strapiHomepage {
+      hero {
+        title
+      }
+      seo {
+        metaTitle
+        metaDescription
+        shareImage {
+          publicURL
+        }
+      }
+    }
+    allStrapiArticle(filter: { status: { eq: "published" } }) {
+      edges {
+        node {
+          strapiId
+          slug
+          title
+          category {
+            name
+          }
+          image {
+            childImageSharp {
+              fixed(width: 800, height: 500) {
+                src
+              }
+            }
+          }
+          author {
+            name
+            picture {
+              childImageSharp {
+                fixed(width: 30, height: 30) {
+                  src
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export default IndexPage;
+```
+25. Créer un fichier `article.js` dans le dossier `components`, y copier coller ce code :
+```
+import React from "react";
+import Card from "./card";
+
+const Articles = ({ articles }) => {
+  const leftArticlesCount = Math.ceil(articles.length / 5);
+  const leftArticles = articles.slice(0, leftArticlesCount);
+  const rightArticles = articles.slice(leftArticlesCount, articles.length);
+
+  return (
+    <div>
+      <div className="uk-child-width-1-2@s" data-uk-grid="true">
+        <div>
+          {leftArticles.map((article, i) => {
+            return (
+              <Card
+                article={article}
+                key={`article__left__${article.node.slug}`}
+              />
+            );
+          })}
+        </div>
+        <div>
+          <div className="uk-child-width-1-2@m uk-grid-match" data-uk-grid>
+            {rightArticles.map((article, i) => {
+              return (
+                <Card
+                  article={article}
+                  key={`article__right__${article.node.slug}`}
+                />
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Articles;
+```
+
+Le composant est bientôit pret, il lui manque le sous composant Card
+
+26. Créer un fichier `card.js` dans le dossier `components`, y copier coller ce code :
+
+```
+import React from "react";
+import { Link } from "gatsby";
+import Img from "gatsby-image";
+
+const Card = ({ article }) => {
+  return (
+    <Link to={`/article/${article.node.slug}`} className="uk-link-reset">
+      <div className="uk-card uk-card-muted">
+        <div className="uk-card-media-top">
+          <Img
+            fixed={article.node.image.childImageSharp.fixed}
+            imgStyle={{ position: "static" }}
+          />
+        </div>
+        <div className="uk-card-body">
+          <p id="category" className="uk-text-uppercase">
+            {article.node.category.name}
+          </p>
+          <p id="title" className="uk-text-large">
+            {article.node.title}
+          </p>
+          <div>
+            <hr className="uk-divider-small" />
+            <div className="uk-grid-small uk-flex-left" data-uk-grid="true">
+              <div>
+                {article.node.author.picture && (
+                  <Img
+                    fixed={article.node.author.picture.childImageSharp.fixed}
+                    imgStyle={{ position: "static", borderRadius: "50%" }}
+                  />
+                )}
+              </div>
+              <div className="uk-width-expand">
+                <p className="uk-margin-remove-bottom">
+                  {article.node.author.name}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+};
+
+export default Card;
+```
+
+*Si vos deux terminaux du back et front sont toujours actifs, et que vous rafraichissez localhost:8000, les articles devraient s'afficher.*
+
+Maintenant que les articles sont initialisés, passons aux pages.
+
+## Les pages du blogs
+
+27. A la racine du dossier frontend, se trouve le fichier `gatsby-node.js`. Copier coller ce code à l'intérieur, à la suite du texte déjà présent :
+```
+exports.createPages = async ({ graphql, actions }) => {
+  const { createPage } = actions;
+  const result = await graphql(
+    `
+      {
+        articles: allStrapiArticle {
+          edges {
+            node {
+              strapiId
+              slug
+            }
+          }
+        }
+      }
+    `
+  );
+
+  if (result.errors) {
+    throw result.errors;
+  }
+
+  // Create blog articles pages.
+  const articles = result.data.articles.edges;
+
+  const ArticleTemplate = require.resolve("./src/templates/article.js");
+
+  articles.forEach((article, index) => {
+    createPage({
+      path: `/article/${article.node.slug}`,
+      component: ArticleTemplate,
+      context: {
+        slug: article.node.slug,
+      },
+    });
+  });
+};
+
+module.exports.onCreateNode = async ({ node, actions, createNodeId }) => {
+  const crypto = require(`crypto`);
+
+  if (node.internal.type === "StrapiArticle") {
+    const newNode = {
+      id: createNodeId(`StrapiArticleContent-${node.id}`),
+      parent: node.id,
+      children: [],
+      internal: {
+        content: node.content || " ",
+        type: "StrapiArticleContent",
+        mediaType: "text/markdown",
+        contentDigest: crypto
+          .createHash("md5")
+          .update(node.content || " ")
+          .digest("hex"),
+      },
+    };
+    actions.createNode(newNode);
+    actions.createParentChildLink({
+      parent: node,
+      child: newNode,
+    });
+  }
+};
+```
+28. Faire à la racine de frontend : `yarn add react-markdown react-moment moment`
+
+29.  Créer un fichier `article.js` dans le dossier `src/templates`, coller dedans : 
+```
+import React from "react";
+import { graphql } from "gatsby";
+import Img from "gatsby-image";
+import Moment from "react-moment";
+import Layout from "../components/layout";
+import Markdown from "react-markdown";
+
+export const query = graphql`
+  query ArticleQuery($slug: String!) {
+    strapiArticle(slug: { eq: $slug }, status: { eq: "published" }) {
+      strapiId
+      title
+      description
+      content
+      publishedAt
+      image {
+        publicURL
+        childImageSharp {
+          fixed {
+            src
+          }
+        }
+      }
+      author {
+        name
+        picture {
+          childImageSharp {
+            fixed(width: 30, height: 30) {
+              src
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const Article = ({ data }) => {
+  const article = data.strapiArticle;
+  const seo = {
+    metaTitle: article.title,
+    metaDescription: article.description,
+    shareImage: article.image,
+    article: true,
+  };
+
+  return (
+    <Layout seo={seo}>
+      <div>
+        <div
+          id="banner"
+          className="uk-height-medium uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-light uk-padding uk-margin"
+          data-src={article.image.publicURL}
+          data-srcset={article.image.publicURL}
+          data-uk-img
+        >
+          <h1>{article.title}</h1>
+        </div>
+
+        <div className="uk-section">
+          <div className="uk-container uk-container-small">
+            <Markdown source={article.content} escapeHtml={false} />
+
+            <hr className="uk-divider-small" />
+
+            <div className="uk-grid-small uk-flex-left" data-uk-grid="true">
+              <div>
+                {article.author.picture && (
+                  <Img
+                    fixed={article.author.picture.childImageSharp.fixed}
+                    imgStyle={{ position: "static", borderRadius: "50%" }}
+                  />
+                )}
+              </div>
+              <div className="uk-width-expand">
+                <p className="uk-margin-remove-bottom">
+                  By {article.author.name}
+                </p>
+                <p className="uk-text-meta uk-margin-remove-top">
+                  <Moment format="MMM Do YYYY">{article.published_at}</Moment>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Layout>
+  );
+};
+
+export default Article;
+```
