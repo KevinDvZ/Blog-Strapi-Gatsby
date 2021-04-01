@@ -369,15 +369,93 @@ export default Layout;
 a. à la racine du backend (blog-strapi), effecteur cette commande dans le terminal : `yarn start`. Laisser le terminal ouvert en arrière plan.
 b. à la racine de front-end, effecteur cette commande dans un nouveau terminal : `yarn start`
 c. Ouvrir localhost:8000 et normalement une page blance avec écrit MY BLOG s'affiche. Si des erreurs de type :
-*  `connectrefused` s'activent, c'est que vous n'avez pas lancer un terminal démarrant le backend. 
+*  `connectrefused` s'activent, c'est que vous n'avez pas lancer un terminal démarrant le backend, ou que le .env et manquant / mal plaçé. 
 * de type `lifecycle`, vous avez probablement oubliez de créer certains fichier ou ne les avez pas placer dans le bon dossier (attention au fichier css notamment), ou qu'il vous manque un package à add avec YARN (attention aux packages manquant de l'étape 19 notamment). 
 
 **Attention à bien re-suivre les étapes dans l'ordre.**
 
 **Ainsi les bases du front devraient être fonctionnelles.** 
 
-21. Si tout est stable, il est conseillé à ce stade d'initilaliser le repo Github à la racine du projet bac et front. Pour celà, dans frontend supprimer le .git .
+21. Si tout est stable, il est conseillé à ce stade d'initilaliser le repo GIT à la racine du projet bac et front, et de le pusher. Pour celà, dans frontend supprimer le .git , couper tout les terminaux (du back et du front)
 * Ouvrir le terminal à la racine du projet, faire la commande `git init`
 * `git branch -M main`
+* `git add . && git commit -m "initialisation blog strapi"`
 * créer un repo sur Github
-* pusher le projet sur l'adresse du repo
+* `git remote add origin **lien du github** `
+* `git push --set-upstream origin main`
+* `git push`
+
+Pensez à réactiver votre backend et front end avec yarn start dans les deux dossier et deux terminaux différents ouverts en parallèles.
+
+22. Création du nav component. Créer un fichier à cet emplacement du frontend : `./src/components/nav.js` , contenant : 
+```
+import React from "react";
+import { Link, StaticQuery, graphql } from "gatsby";
+
+const Nav = () => (
+  <StaticQuery
+    query={graphql`
+      query {
+        strapiGlobal {
+          siteName
+        }
+        allStrapiCategory {
+          edges {
+            node {
+              slug
+              name
+            }
+          }
+        }
+      }
+    `}
+    render={(data) => (
+      <div>
+        <div>
+          <nav className="uk-navbar-container" data-uk-navbar>
+            <div className="uk-navbar-left">
+              <ul className="uk-navbar-nav">
+                <li>
+                  <Link to="/">{data.strapiGlobal.siteName}</Link>
+                </li>
+              </ul>
+            </div>
+            <div className="uk-navbar-right">
+              <button
+                className="uk-button uk-button-default uk-margin-right"
+                type="button"
+              >
+                Categories
+              </button>
+              <div uk-dropdown="animation: uk-animation-slide-top-small; duration: 1000">
+                <ul className="uk-nav uk-dropdown-nav">
+                  {data.allStrapiCategory.edges.map((category, i) => (
+                    <li key={`category__${category.node.slug}`}>
+                      <Link to={`/category/${category.node.slug}`}>
+                        {category.node.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </nav>
+        </div>
+      </div>
+    )}
+  />
+);
+
+export default Nav;
+```
+fermer, enregistrer.
+
+23. Ouvrir le fichier `components/layout.js` , ajouter juste en dessous des imports, au dessus de const Layout (ligne 5 normalement) :
+```
+import Nav from "./nav";
+```
+
+et rajouter en dessous de la balise `<Seo seo={seo}=>` (entre la ligne 24 et 25 normalement) :
+`<Nav />`
+
+***si vous souhaitez voir le résultat, vous pouvez faire le `yarn start` dans votre dossier frontend, et afficher localhost:8080***

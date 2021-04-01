@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { StaticQuery, graphql } from "gatsby";
 import Seo from "./seo";
+import Nav from "./nav";
 
 const Layout = ({ children, seo }) => (
   <StaticQuery
@@ -21,6 +22,7 @@ const Layout = ({ children, seo }) => (
     render={(data) => (
       <>
         <Seo seo={seo} />
+		<Nav />
         <main>{children}</main>
       </>
     )}
