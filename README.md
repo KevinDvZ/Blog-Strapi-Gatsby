@@ -1,5 +1,7 @@
 # Tuto pour repoduire ce blog Strapi / Gatsby 
 
+***Nous passerons en revues le tuto de cette page `https://strapi.io/blog/build-a-static-blog-with-gatsby-and-strapi`, avec les correctifs du tuto en plus (merci aux feedback des simploniens), puis selon les exigences d'un exercice dans le cadre de ma formation, je vous proposerai mon interprétation du développement de la partie des commentaires des articles*** 
+
 ## Pré-requis 
 ### (les commandes peuvent se faire dans tout terminal, dans tout dossier)
 
@@ -957,3 +959,17 @@ export default Category;
 ```
 
 Redémarrer le serveur front end, les catégories devraient être maintenant fonctionnelles. 
+
+## Les exigences du brief Simplon
+
+### Les commentaires
+
+Pour rappel, le brief demande :
+```
+Comme votre but est de générer de l'engagement, vous vous devrez d'ajouter un espace de commentaire en dessous des articles.
+
+Il doit donc y avoir un blog avec quelques articles (vous pouvez laisser ceux fourni en exemples), un formulaire d'ajout de commentaire en dessous de chaque articles suivi de la liste des commentaire pour cet article.
+```
+
+Voici mon approche :
+en back end
