@@ -972,4 +972,73 @@ Il doit donc y avoir un blog avec quelques articles (vous pouvez laisser ceux fo
 ```
 
 Voici mon approche :
-en back end
+en back end, j'ai utilisé l'outil de création `Content Types Builder`, présent dans la navbar sous la catégorie Plugins, dans l'admnistration de Strapi. J'ai donc configurer sur mon PC le plugins Comments, commiter sur le repo et pusher. Il est important que la fonctionnalité soit stable pour qu'elle puisse être pushée sur Heroku.
+
+1. Démarrer Stapi via le terminal (yarn start)
+2. Accéder à Content TYpe Builder`
+3. Cliquer sur "Créer un type de Collection"
+4. Dans le formulaire, nommer cete nouvelle collection "Comment", valider
+5. Cliquer sur "Ajouter un champ à cette collection"
+6. Cliquer sur Relations
+7. Vérifier bien que l'état de relation entre un commentaire et un article soit sur "Comment a un Article" (flechè avec un point comme départ, la première en partant de la gauche dans la liste). Cliquer sur Terminer.
+8. Répéter l'opération pour composer tout ce qui est intégré au commentaires. Pour ma part j'ai ajouter un champ email, un champ texte (de type long text) que j'ai nommé "message". Valider. L'interface va surement vous demander de redémarrer le serveur, accepter. 
+9. Il faut maintenant créer le controller des comments, là il faut créer les endoints de requetes depuis gatsby. Ouvrir le fichier js `backend/api/comments/controller/comment.js`
+10. Y copier entre les oreilles (ou balises) de modules.exports = { `ICI` } déjà présent ce code :
+```
+  // this method is called when api to create comment is called
+    async create(ctx) {
+        // add user from the request and add it to the body of request
+        ctx.request.body.user = ctx.state.user.id;
+        // call the function to creating comment with data
+        let entity = await strapi.services.comment.create(ctx.request.body);
+        // return data for api after removing field which are not exported
+        return sanitizeEntity(entity, { model: strapi.models.comment });
+    },
+    async update(ctx) {
+        // get the id of comment which is updated
+        const { id } = ctx.params;
+        // finding the comment for user and id
+        const [comment] = await strapi.services.comment.find({
+            id: ctx.params.id,
+            'user.id': ctx.state.user.id,
+        });
+        // comment does not exist send error
+        if (!comment) {
+            return ctx.unauthorized(`You can't update this entry`);
+        }
+        // update the comment
+        let entity = await strapi.services.comment.update({ id }, ctx.request.body);
+         // return data for api after removing field which are not exported
+        return sanitizeEntity(entity, { model: strapi.models.comment });
+    },
+    async delete(ctx) {
+        // get the id of comment which is updated
+        const { id } = ctx.params;
+        // finding the comment for user and id
+        const [comment] = await strapi.services.comment.find({
+            id: ctx.params.id,
+            'user.id': ctx.state.user.id,
+        });
+        // comment does not exist send error
+        if (!comment) {
+            return ctx.unauthorized(`You can't update this entry`);
+        }
+        // delete the comment
+        let entity = await strapi.services.comment.delete({ id });
+         // return data for api after removing field which are not exported
+        return sanitizeEntity(entity, { model: strapi.models.comment });
+    },
+};
+```
+Redémarrer le serveur (fermer le terminal, en ouvrir un nouveau dans le dossier backend et yarn start)
+
+11. Se reconnter sur localhost:1337/admin/
+
+12. Créer des commentaires bidons en allant dans la nav bar à gauche dans le menu `Comment`
+
+13. remplisser le formulaire de vos champs, en oubliant pas de faire correspondre le commentaire à un article (bloc article détail sur la droite, menu déroulant).
+
+14. Maintenant que des commentaires bidons sont liés à un ou des articles, allons faire les modifs nécessaires en front end.
+
+** Front-end : Gatsby
+
