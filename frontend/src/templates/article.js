@@ -4,6 +4,7 @@ import Img from "gatsby-image";
 import Moment from "react-moment";
 import Layout from "../components/layout";
 import Markdown from "react-markdown";
+import Comments from '../components/comments';
 
 export const query = graphql`
   query ArticleQuery($slug: String!) {
@@ -30,7 +31,7 @@ export const query = graphql`
             }
           }
         }
-      }
+      }       
     }
   }
 `;
@@ -43,10 +44,7 @@ const Article = ({ data }) => {
     shareImage: article.image,
     article: true,
   };
-  const comments = {
-    message: article.comments.message,
-    author: article.comments.author
-  }
+
 
   return (
     <Layout seo={seo}>
@@ -83,6 +81,10 @@ const Article = ({ data }) => {
                 <p className="uk-text-meta uk-margin-remove-top">
                   <Moment format="MMM Do YYYY">{article.published_at}</Moment>
                 </p>
+              </div>
+              <div className="comment-section">
+                <h4 className="comment-header">Comments</h4>
+                <Comments />
               </div>
             </div>
           </div>

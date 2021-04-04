@@ -980,13 +980,14 @@ en back end, j'ai utilisé l'outil de création `Content Types Builder`, présen
 1. Démarrer Stapi via le terminal (yarn start)
 2. Accéder à Content TYpe Builder`
 3. Cliquer sur "Créer un type de Collection"
-4. Dans le formulaire, nommer cete nouvelle collection "Comment", valider
+4. Dans le formulaire, nommer cette nouvelle collection "Comment", valider
 5. Cliquer sur "Ajouter un champ à cette collection"
 6. Cliquer sur Relations
 7. Vérifier bien que l'état de relation entre un commentaire et un article soit sur "Comment a un Article" (flechè avec un point comme départ, la première en partant de la gauche dans la liste). Cliquer sur Terminer.
 8. Répéter l'opération pour composer tout ce qui est intégré au commentaires. Pour ma part j'ai ajouter un champ email, un champ texte (de type long text) que j'ai nommé "message". Valider. L'interface va surement vous demander de redémarrer le serveur, accepter.
 9. Il faut maintenant créer le controller des comments, là il faut créer les endoints de requetes depuis gatsby. Ouvrir le fichier js `backend/api/comments/controller/comment.js`
 10. Y copier entre les oreilles (ou balises) de modules.exports = { `ICI` } déjà présent ce code :
+
 ```
   // this method is called when api to create comment is called
     async create(ctx) {
@@ -1049,13 +1050,16 @@ Vous pouvez tester dans Postman au endoint localhost:1337/comment voir si le jso
 
 Allons maintenant faire les modifs nécessaires en front end.
 
-** Front-end : Gatsby
+**Front-end : Gatsby**
+
 La liste des commentaires doit d'afficher dans les articles. On va devoir modifier le modèle des articles.
 
 1. Créer un fichier comments.js dans le dossier components/
 
-2. 
+2. Dans le fichier `templates/article.js`, rajouter dans la query, en dessous de l'objet author, à la ligne 34 environ, rajouter l'objet comments avec les attributs de l'objet en back end.
 
+```
+```
 
 
 
