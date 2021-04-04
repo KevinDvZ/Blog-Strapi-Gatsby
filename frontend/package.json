@@ -17,6 +17,8 @@
     "gatsby-source-filesystem": "^3.1.0",
     "gatsby-source-strapi": "^0.0.12",
     "gatsby-transformer-sharp": "^3.1.0",
+    "global": "^4.4.0",
+    "kill-port": "^1.6.1",
     "moment": "^2.29.1",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",

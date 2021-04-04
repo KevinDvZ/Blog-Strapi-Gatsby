@@ -43,6 +43,10 @@ const Article = ({ data }) => {
     shareImage: article.image,
     article: true,
   };
+  const comments = {
+    message: article.comments.message,
+    author: article.comments.author
+  }
 
   return (
     <Layout seo={seo}>
