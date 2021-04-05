@@ -985,12 +985,7 @@ en back end, j'ai utilisé l'outil de création `Content Types Builder`, présen
 6. Cliquer sur Relations
 7. Vérifier bien que l'état de relation entre un commentaire et un article soit sur "Comment a un Article" (flechè avec un point comme départ, la première en partant de la gauche dans la liste). Cliquer sur Terminer.
 8. Répéter l'opération pour composer tout ce qui est intégré au commentaires. Pour ma part j'ai ajouter un champ email, un champ texte (de type long text) que j'ai nommé "message". Valider. L'interface va surement vous demander de redémarrer le serveur, accepter.
-9. Il faut maintenant créer le controller des comments, là il faut créer les endoints de requetes depuis gatsby. Ouvrir le fichier js `backend/api/comments/controller/comment.js`
-10. Y copier entre les oreilles (ou balises) de modules.exports = { `ICI` } déjà présent ce code :
 
-```
-
-```
 Redémarrer le serveur (fermer le terminal, en ouvrir un nouveau dans le dossier backend et yarn start)
 
 11. Se reconnecter sur localhost:1337/admin/
@@ -1007,7 +1002,7 @@ Vous pouvez tester dans Postman au endoint localhost:1337/comment voir si le jso
 
 Allons maintenant faire les modifs nécessaires en front end.
 
-**Front-end : Gatsby**
+#Front-end : Gatsby
 
 **(attention, dans mon cas j'ai nommé dans le Backend ma classe "Comments", au pluriel. Faites attention à faire correspondre les codes suivant avec votre projet en corrigeant l'erreur. )**
 
