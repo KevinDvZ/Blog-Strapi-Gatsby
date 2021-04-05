@@ -64,10 +64,13 @@ hr {
 
 }
 
-.comment-block  h4 {
-    float: right;
-
+.comment-date {
+    float: right
 }
- p {
-    text-align: center;
+
+.comment-author {
+    float: left;
+}
+.comment-block p {
+    text-align: center
 }

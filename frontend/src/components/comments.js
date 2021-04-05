@@ -10,9 +10,9 @@ const Comments = ({ comments }) => {
                     {comments.length ? (
                         comments.map((comment) => (
                          <div className="comment-block">
-                            <h3>Ecrit par : {comment.author}</h3>
-                                 <h4> le {comment.created_at}</h4>
-                                 <p>{comment.message}</p>
+                            <h4 className="comment-author">Ecrit par : {comment.author}</h4>
+                                 <h4 className="comment-date"> le {comment.created_at}</h4>
+                                 <p className="comment-content">{comment.message}</p>
                          </div>
                                                  ))
                     ) : (

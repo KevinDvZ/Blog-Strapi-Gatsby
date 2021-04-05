@@ -989,50 +989,7 @@ en back end, j'ai utilisé l'outil de création `Content Types Builder`, présen
 10. Y copier entre les oreilles (ou balises) de modules.exports = { `ICI` } déjà présent ce code :
 
 ```
-  // this method is called when api to create comment is called
-    async create(ctx) {
-        // add user from the request and add it to the body of request
-        ctx.request.body.user = ctx.state.user.id;
-        // call the function to creating comment with data
-        let entity = await strapi.services.comment.create(ctx.request.body);
-        // return data for api after removing field which are not exported
-        return sanitizeEntity(entity, { model: strapi.models.comment });
-    },
-    async update(ctx) {
-        // get the id of comment which is updated
-        const { id } = ctx.params;
-        // finding the comment for user and id
-        const [comment] = await strapi.services.comment.find({
-            id: ctx.params.id,
-            'user.id': ctx.state.user.id,
-        });
-        // comment does not exist send error
-        if (!comment) {
-            return ctx.unauthorized(`You can't update this entry`);
-        }
-        // update the comment
-        let entity = await strapi.services.comment.update({ id }, ctx.request.body);
-         // return data for api after removing field which are not exported
-        return sanitizeEntity(entity, { model: strapi.models.comment });
-    },
-    async delete(ctx) {
-        // get the id of comment which is updated
-        const { id } = ctx.params;
-        // finding the comment for user and id
-        const [comment] = await strapi.services.comment.find({
-            id: ctx.params.id,
-            'user.id': ctx.state.user.id,
-        });
-        // comment does not exist send error
-        if (!comment) {
-            return ctx.unauthorized(`You can't update this entry`);
-        }
-        // delete the comment
-        let entity = await strapi.services.comment.delete({ id });
-         // return data for api after removing field which are not exported
-        return sanitizeEntity(entity, { model: strapi.models.comment });
-    },
-};
+
 ```
 Redémarrer le serveur (fermer le terminal, en ouvrir un nouveau dans le dossier backend et yarn start)
 
@@ -1052,14 +1009,323 @@ Allons maintenant faire les modifs nécessaires en front end.
 
 **Front-end : Gatsby**
 
-La liste des commentaires doit d'afficher dans les articles. On va devoir modifier le modèle des articles.
+**(attention, dans mon cas j'ai nommé dans le Backend ma classe "Comments", au pluriel. Faites attention à faire correspondre les codes suivant avec votre projet en corrigeant l'erreur. )**
 
-1. Créer un fichier comments.js dans le dossier components/
 
-2. Dans le fichier `templates/article.js`, rajouter dans la query, en dessous de l'objet author, à la ligne 34 environ, rajouter l'objet comments avec les attributs de l'objet en back end.
+##La liste des commentaires doit s'afficher dans les articles. 
+
+On va devoir modifier le modèle des articles. J'ai décidé donc de passer par GraphQL, qui sous-tend le focntionnement de Gatsby, en utilisant le "slug" de chaque article ( extension de lien url de chaque article).
+Il faut savoir que chaque commande que j'ai utilisé ont été généré par GraphIql, l'interface de génération de requetes de Gatsby. Avant de pourvoir y accéder, il faut inclure les "commentaires" au moment de la compilation de Gatsby.
+
+1. Dans `gatsby-node.js`, rajouter dans la liste des requetes GrahQl :
+   ```
+   comments: allStrapiComments {
+   edges {
+   node {
+   strapiId
+   }
+   }
+   }
+   ```
+   
+Voici mon fichier entier gatsby-node.js entier si jamais vous avez des erreurs innoportunes :
 
 ```
+exports.createPages = async ({ graphql, actions }) => {
+  const { createPage } = actions;
+  const result = await graphql(
+    `
+      {
+        articles: allStrapiArticle {
+          edges {
+            node {
+              strapiId
+              slug
+            }
+          }
+        }
+        categories: allStrapiCategory {
+          edges {
+            node {
+              strapiId
+              slug
+            }
+          }
+        }
+        comments: allStrapiComments {
+          edges {
+            node {
+              strapiId
+            }
+          }
+        }
+      }
+    `
+  );
+
+  if (result.errors) {
+    throw result.errors;
+  }
+
+  // Create blog articles pages.
+  const articles = result.data.articles.edges;
+  const categories = result.data.categories.edges;
+
+  const ArticleTemplate = require.resolve("./src/templates/article.js");
+
+  articles.forEach((article, index) => {
+    createPage({
+      path: `/article/${article.node.slug}`,
+      component: ArticleTemplate,
+      context: {
+        slug: article.node.slug,
+      },
+    });
+  });
+
+  const CategoryTemplate = require.resolve("./src/templates/category.js");
+
+  categories.forEach((category, index) => {
+    createPage({
+      path: `/category/${category.node.slug}`,
+      component: CategoryTemplate,
+      context: {
+        slug: category.node.slug,
+      },
+    });
+  });
+};
+
+module.exports.onCreateNode = async ({ node, actions, createNodeId }) => {
+  const crypto = require(`crypto`);
+
+  if (node.internal.type === "StrapiArticle") {
+    const newNode = {
+      id: createNodeId(`StrapiArticleContent-${node.id}`),
+      parent: node.id,
+      children: [],
+      internal: {
+        content: node.content || " ",
+        type: "StrapiArticleContent",
+        mediaType: "text/markdown",
+        contentDigest: crypto
+          .createHash("md5")
+          .update(node.content || " ")
+          .digest("hex"),
+      },
+    };
+    actions.createNode(newNode);
+    actions.createParentChildLink({
+      parent: node,
+      child: newNode,
+    });
+  }
+};
 ```
 
+2. Dans le fichier `gatsby-config.js`, rajouter dans le groupement `  resolve: "gatsby-source-strapi",`, dans le tableau `contentTypes:` (ligne 19 dans mon cas), l'élément "comments". Ce qui devrait donner :
+   ```
+       {
+      resolve: "gatsby-source-strapi",
+      options: {
+        apiURL: process.env.API_URL || "http://localhost:1337",
+        contentTypes: ["article", "category", "writer","comments"],
+        singleTypes: [`homepage`, `global`],
+        queryLimit: 1000,
+      },
+    },
+   
+   ```
 
+3. Sauvegarder, le front-end va surement redémarrer. 
 
+4. Vous pouvez maintenant accéder depuis le front-end à l'adresse GraphiQL :
+
+```
+http://localhost:8000/___graphql
+```
+
+C'est en cumulant les bons paramètres et en expérimantant les résultats que j'ai pu trouver cette commande graphql qui récupère la liste des commentaires pour chaque article :
+
+```
+     allStrapiComments(filter: {article: {slug: { eq: $slug }, status: { eq: "published" }}}) {
+    nodes {
+      email
+      message
+      author
+      created_at(formatString: "DD MMMM YYYY à HH:MM", locale: "FR")
+      strapiId
+    }
+  }
+```
+
+5. Copier coller cette requete à la suite des requetes graphQL de `templates/article.js`. Ce qui devrait donner pour la requete entière :
+
+```
+
+export const query = graphql`
+  query ArticleQuery($slug: String!) {
+    strapiArticle(slug: { eq: $slug }, status: { eq: "published" }) {
+      strapiId
+      title
+      description
+      content
+      publishedAt
+      image {
+        publicURL
+        childImageSharp {
+          fixed {
+            src
+          }
+        }
+      }
+      author {
+        name
+        picture {
+          childImageSharp {
+            fixed(width: 30, height: 30) {
+              src
+            }
+          }
+        }
+      }       
+    }
+     allStrapiComments(filter: {article: {slug: { eq: $slug }, status: { eq: "published" }}}) {
+    nodes {
+      email
+      message
+      author
+      created_at(formatString: "DD MMMM YYYY à HH:MM", locale: "FR")
+      strapiId
+    }
+  }
+
+  }
+`;
+```
+
+6. Créer un fichier comments.js dans le dossier components/, y copier-coller ce code :
+```
+import React from 'react';
+import '../assets/css/comment.css';
+
+const Comments = ({ comments }) => {
+        console.log(comments)
+        return (
+            <div>
+                <hr />
+                <div className="comment-list">
+                    {comments.length ? (
+                        comments.map((comment) => (
+                         <div className="comment-block">
+                            <h4 className="comment-author">Ecrit par : {comment.author}</h4>
+                                 <h4 className="comment-date"> le {comment.created_at}</h4>
+                                 <p className="comment-content">{comment.message}</p>
+                         </div>
+                                                 ))
+                    ) : (
+                        <h5 className="no-comments-alert">
+                            No comments on this post yet. Be the first!
+                        </h5>
+                    )}
+                </div>
+            </div>
+        );
+};
+
+export default Comments;
+```
+
+7. Créer le fichier comment.css dans `src/css`, y copier coller ce code :
+
+```
+ .comment-form {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    padding: 10px 25px 20px 0;
+}
+.comment-form > input,
+.comment-form > textarea {
+    width: 100%;
+    border: 3px solid rgb(143, 51, 143);
+    margin: 12px 0;
+    padding: 7px 14px;
+    font-size: 14px;
+    opacity: 0.8;
+    font-weight: bold;
+    box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+}
+.comment-form > div > .submit-button {
+    padding: 8px 45px;
+    background: rgb(143, 51, 143);
+    color: whitesmoke;
+    border-radius: 35px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.3);
+    text-transform: uppercase;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.comment__meta > h5 {
+    font-size: 15px;
+    color: purple;
+    opacity: 0.7;
+    margin-bottom: 3px;
+    line-height: 1;
+}
+hr {
+    background: rgba(0, 0, 0, 0.2);
+    height: 3px;
+}
+.comment__meta > span {
+    font-size: 14px;
+    font-weight: bold;
+    opacity: 0.5;
+}
+.comment__body {
+    font-size: 18px;
+    opacity: 0.8;
+    font-family: 'Rajdhani', cursive;
+}
+.no-comments-alert {
+    font-size: 16px;
+    color: purple;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: -0.3px;
+}
+
+.comment-block {
+    border: 1px solid;
+    padding: 15px;
+    margin-top: 10px;
+    border-radius: 30px;
+
+}
+
+.comment-date {
+    float: right
+}
+
+.comment-author {
+    float: left;
+}
+.comment-block p {
+    text-align: center
+}
+```
+
+8. Dans le fichier `templates/article.js`, rajouter la déclaration des commentaires quelque-part dans votre template (pour ma part ligne 98), en collant le code suivant
+
+```
+          <div className="comment-section">
+            <h4 className="comment-header">Commentaires</h4>
+            <Comments comments={comments}/>
+          </div>
+```
+
+9. Enregistrer / redémarrer. Si tout se passe bien, la liste des commentaires pour chaque article devrait s'afficher. Libre à vous de modifier son css.
+
+## Un visiteur doit pouvoir poster un commentaire : 
