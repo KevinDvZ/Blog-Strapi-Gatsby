@@ -6,6 +6,7 @@ import Layout from "../components/layout";
 import Markdown from "react-markdown";
 import Comments from '../components/comments';
 
+
 export const query = graphql`
   query ArticleQuery($slug: String!) {
     strapiArticle(slug: { eq: $slug }, status: { eq: "published" }) {
@@ -57,6 +58,7 @@ const Article = ({ data }) => {
   const comments = data.allStrapiComments.nodes;
 
 
+
   return (
     <Layout seo={seo}>
       <div>
@@ -97,7 +99,7 @@ const Article = ({ data }) => {
           </div>
           <div className="comment-section">
             <h4 className="comment-header">Commentaires</h4>
-            <Comments comments={comments}/>
+            <Comments comments={comments} article={article}/>
           </div>
         </div>
       </div>

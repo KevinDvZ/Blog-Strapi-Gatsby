@@ -19,7 +19,8 @@ exports.createPages = async ({ graphql, actions }) => {
             }
           }
         }
-        comments: allStrapiComments {
+        comments: 
+        allStrapiComments {
           edges {
             node {
               strapiId
@@ -88,3 +89,5 @@ module.exports.onCreateNode = async ({ node, actions, createNodeId }) => {
     });
   }
 };
+
+

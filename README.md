@@ -1234,12 +1234,14 @@ export default Comments;
 7. Créer le fichier comment.css dans `src/css`, y copier coller ce code :
 
 ```
- .comment-form {
+.comment-form {
     display: flex;
     flex-direction: column;
     width: 50%;
-    padding: 10px 25px 20px 0;
-}
+    padding: 100px 25px 20px 0;
+    margin-left: auto;
+    margin-right: auto;
+    }
 .comment-form > input,
 .comment-form > textarea {
     width: 100%;
@@ -1293,7 +1295,7 @@ hr {
 }
 
 .comment-block {
-    border: 1px solid;
+    border: 5px solid;
     padding: 15px;
     margin-top: 10px;
     border-radius: 30px;
@@ -1310,6 +1312,7 @@ hr {
 .comment-block p {
     text-align: center
 }
+
 ```
 
 8. Dans le fichier `templates/article.js`, rajouter la déclaration des commentaires quelque-part dans votre template (pour ma part ligne 98), en collant le code suivant
@@ -1324,3 +1327,28 @@ hr {
 9. Enregistrer / redémarrer. Si tout se passe bien, la liste des commentaires pour chaque article devrait s'afficher. Libre à vous de modifier son css.
 
 ## Un visiteur doit pouvoir poster un commentaire : 
+
+1. Rajouter le formulaire dans `template/article.js`, juste après la liste des commentaires. 
+```
+<form className="comment-form">
+            <h4 className="comment-post">Laissez un commentaire</h4>
+            <input
+             placeholder="Votre pseudo/nom"
+             value={submit.name}
+             name="name"
+             onChange={submit.handleChange}
+            />
+            <textarea
+             placeholder="Votre commentaire"
+             rows="4"
+             name="comment"
+             value={submit.comment}
+             onChange={submit.handleChange}
+            />
+            <div>
+              <button className="button submit-button">Envoyer</button>
+            </div>
+          </form>
+```
+
+Redémarrer, vous devriez voir le formulaire.
