@@ -19,6 +19,13 @@ exports.createPages = async ({ graphql, actions }) => {
             }
           }
         }
+        comments: allStrapiComments {
+          edges {
+            node {
+              strapiId
+            }
+          }
+        }
       }
     `
   );

@@ -1,49 +1,28 @@
 import React from 'react';
-import Pusher from 'pusher-js';
-import CommentForm from './form';
-import Comment from './Comment';
-import './css/comment.css';
+import '../assets/css/comment.css';
 
-//test
-
-class Comments extends React.Component {
-    constructor() {
-        super();
-        this.state = {
-            comments: [],
-        };
-        this.pusher = new Pusher('PUSHER_KEY', {
-            cluster: 'eu',
-        });
-    }
-    componentDidMount() {
-        const channel = this.pusher.subscribe('post-comment');
-        channel.bind('new-comment', (data) => {
-            this.setState((prevState) => ({
-                comments: [...prevState.comments, data],
-            }));
-        });
-    }
-
-    render() {
-        const { comments } = this.state;
+const Comments = ({ comments }) => {
+        console.log(comments)
         return (
             <div>
-                <CommentForm />
                 <hr />
                 <div className="comment-list">
                     {comments.length ? (
                         comments.map((comment) => (
-                            <Comment comment={comment} key={comment.id} />
-                        ))
+                         <div className="comment-block">
+                            <h3>Ecrit par : {comment.author}</h3>
+                                 <h4> le {comment.created_at}</h4>
+                                 <p>{comment.message}</p>
+                         </div>
+                                                 ))
                     ) : (
                         <h5 className="no-comments-alert">
-                            No comments on this post yet. Be the first
+                            No comments on this post yet. Be the first!
                         </h5>
                     )}
                 </div>
             </div>
         );
-    }
-}
+};
+
 export default Comments;

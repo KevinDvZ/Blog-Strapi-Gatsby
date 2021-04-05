@@ -33,6 +33,16 @@ export const query = graphql`
         }
       }       
     }
+     allStrapiComments(filter: {article: {slug: { eq: $slug }, status: { eq: "published" }}}) {
+    nodes {
+      email
+      message
+      author
+      created_at(formatString: "DD MMMM YYYY à HH:MM", locale: "FR")
+      strapiId
+    }
+  }
+
   }
 `;
 
@@ -44,6 +54,7 @@ const Article = ({ data }) => {
     shareImage: article.image,
     article: true,
   };
+  const comments = data.allStrapiComments.nodes;
 
 
   return (
@@ -82,11 +93,11 @@ const Article = ({ data }) => {
                   <Moment format="MMM Do YYYY">{article.published_at}</Moment>
                 </p>
               </div>
-              <div className="comment-section">
-                <h4 className="comment-header">Comments</h4>
-                <Comments />
-              </div>
             </div>
+          </div>
+          <div className="comment-section">
+            <h4 className="comment-header">Commentaires</h4>
+            <Comments comments={comments}/>
           </div>
         </div>
       </div>

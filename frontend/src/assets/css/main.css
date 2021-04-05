@@ -30,6 +30,11 @@ h1 {
   line-height: 1.75 !important;
 }
 
+.comment-section {
+  padding-top: 20px;
+  padding: 10px 25% 10px 25%;
+}
+
 .uk-navbar-container {
   background: #fff !important;
   font-family: Staatliches !important;
