@@ -3,15 +3,14 @@ import '../assets/css/comment.css';
 import {stringify} from "qs";
 
 
+
 const submitForm = ((ev, strapiId) => {
+
  ev.preventDefault();
- console.log("Message envoyé :>> ", ev.target.message.value)
- console.log("Author envoyé :>> ", ev.target.author.value)
-console.log("Numero article:" + strapiId+ "contenu de l'event :" )
- fetch("http://niveaubonus.fr:1337/comments", {
-        method: 'POST',
+ fetch(`${process.env.GATSBY_API_URL}/graphql`, {
+        method: 'post',
         headers: {
-         'Accept': 'application/json',
+         Accept: 'application/json',
          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -28,12 +27,11 @@ console.log("Numero article:" + strapiId+ "contenu de l'event :" )
                         }
                 },
         }),
-}).then((res) => res.json()).then((result) => console.log("COMMENTAIRE ENVOYE >> "+ stringify(result)))});
-
+}).then((res) => fetch(`${process.env.GATSBY_ROOT_URL}/__refresh`, {method:'POST'})).then(() => window.location.reload())})
 
 
 const Comments = ({ comments, article }) => {
-
+console.log(comments)
         return (
             <div>
                 <hr />

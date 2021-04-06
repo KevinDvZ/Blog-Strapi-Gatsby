@@ -34,7 +34,7 @@ export const query = graphql`
         }
       }       
     }
-     allStrapiComments(filter: {article: {slug: { eq: $slug }, status: { eq: "published" }}}) {
+     allStrapiComments(filter: {article: {slug: { eq: $slug }}}) {
     nodes {
       email
       message
