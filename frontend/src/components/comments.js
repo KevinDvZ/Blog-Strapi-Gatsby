@@ -27,7 +27,7 @@ const submitForm = ((ev, strapiId) => {
                         }
                 },
         }),
-}).then((res) => fetch(`${process.env.GATSBY_ROOT_URL}/__refresh`, {method:'POST'})).then(() => window.location.reload())})
+}).then((res) => fetch(`${process.env.GATSBY_ROOT_URL}/__refresh`, {method:'POST'})).then(() => console.log("OK"))})
 
 
 const Comments = ({ comments, article }) => {
