@@ -1,16 +1,11 @@
 
 import '../assets/css/comment.css';
-import React, { Component } from 'react'
+import React from 'react'
 
 let localHoust ="";
-class App extends Component {
-componentDidMount() {
- localHoust =  window.location.protocol + "//" + window.location.host;
-}
-}
 
 const submitForm = ((ev, strapiId) => {
-
+ localHoust =  window.location.protocol + "//" + window.location.host;
  ev.preventDefault();
  fetch(`${process.env.GATSBY_API_URL}`, {
         method: 'post',
