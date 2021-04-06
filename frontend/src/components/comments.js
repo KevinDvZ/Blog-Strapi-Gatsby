@@ -1,9 +1,7 @@
 import React from 'react';
 import '../assets/css/comment.css';
-import {stringify} from "qs";
 
-
-
+const localHoust =  window.location.protocol + "//" + window.location.host;
 const submitForm = ((ev, strapiId) => {
 
  ev.preventDefault();
@@ -27,7 +25,8 @@ const submitForm = ((ev, strapiId) => {
                         }
                 },
         }),
-}).then((res) => fetch(`${process.env.GATSBY_ROOT_URL}/__refresh`, {method:'POST'})).then(() => console.log("OK"))})
+}).then((res) => fetch(`${localHoust}/__refresh`, {method:'POST'})).then(() =>
+console.log(localHoust))})
 
 
 const Comments = ({ comments, article }) => {
