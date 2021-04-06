@@ -1,10 +1,11 @@
-import React from 'react';
+
 import '../assets/css/comment.css';
+import React, { Component } from 'react'
 
-
+let localHoust ="";
 class App extends Component {
 componentDidMount() {
-const localHoust =  window.location.protocol + "//" + window.location.host;
+ localHoust =  window.location.protocol + "//" + window.location.host;
 }
 }
 
