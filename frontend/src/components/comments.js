@@ -1,7 +1,13 @@
 import React from 'react';
 import '../assets/css/comment.css';
 
+
+class App extends Component {
+componentDidMount() {
 const localHoust =  window.location.protocol + "//" + window.location.host;
+}
+}
+
 const submitForm = ((ev, strapiId) => {
 
  ev.preventDefault();
