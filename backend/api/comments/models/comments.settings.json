@@ -2,7 +2,8 @@
   "kind": "collectionType",
   "collectionName": "comments",
   "info": {
-    "name": "Comments"
+    "name": "Comments",
+    "description": ""
   },
   "options": {
     "increments": true,
@@ -10,14 +11,17 @@
     "draftAndPublish": true
   },
   "attributes": {
-    "article": {
-      "model": "article"
-    },
     "message": {
       "type": "text"
     },
     "email": {
       "type": "email"
+    },
+    "author": {
+      "type": "string"
+    },
+    "article": {
+      "model": "article"
     }
   }
 }
