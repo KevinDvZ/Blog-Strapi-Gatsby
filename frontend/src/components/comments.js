@@ -7,7 +7,7 @@ import {stringify} from "qs";
 const submitForm = ((ev, strapiId) => {
 
  ev.preventDefault();
- fetch(`${process.env.GATSBY_API_URL}/graphql`, {
+ fetch(`${process.env.GATSBY_API_URL}`, {
         method: 'post',
         headers: {
          Accept: 'application/json',
@@ -20,7 +20,7 @@ const submitForm = ((ev, strapiId) => {
                                 "data": {
                                  "article": strapiId,
                                  "author": ev.target.author.value,
-                                        "message": ev.target.message.value,
+                                 "message": ev.target.message.value,
 
 
                                 }
