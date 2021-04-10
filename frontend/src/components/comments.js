@@ -1,6 +1,7 @@
 
 import '../assets/css/comment.css';
 import React from 'react'
+const fetch = require("node-fetch");
 
 let comments = [];
 fetch(
