@@ -1,7 +1,7 @@
 
 import '../assets/css/comment.css';
 import React from 'react'
-const fetch = require("node-fetch");
+const fetch = require('whatwg-fetch');
 
 let comments = [];
 const apiUrl = process.env.API_URL;
@@ -13,7 +13,6 @@ const submitForm = ((ev, strapiId) => {
         method: 'post',
         headers: {
          Accept: 'application/json',
-         'Content-Type': 'application/json'
         },
         body: JSON.stringify({
                 "query": `mutation ($input: createCommentInput!){createComment(input: $input){comment{message, author, article{id}}}}`,
