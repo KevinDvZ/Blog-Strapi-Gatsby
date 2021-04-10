@@ -100,7 +100,7 @@ const Article = ({ data }) => {
           </div>
           <div className="comment-section">
             <h4 className="comment-header">Commentaires</h4>
-            <Comments comments={comments} article={article}/>
+            <Comments article={article}/>
           </div>
         </div>
       </div>
