@@ -28,10 +28,10 @@ const submitForm = ((ev, strapiId) => {
 }).then(() => window.location.reload())});
 
 
-const Comments = ({ comments, article }) => {
-    comments = {};
+const Comments = ({ article }) => {
+    let comments = [];
     fetch(
-        process.env.API_URL +
+        process.env.API_URL + "/comments?article=" +
         article.strapiId
     )
         .then(res => res.json())
