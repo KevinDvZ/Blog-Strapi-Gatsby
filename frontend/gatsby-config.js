@@ -2,6 +2,8 @@ require("dotenv").config({
   path: `.env`,
 });
 
+require('https').globalAgent.options.ca = require('ssl-root-cas/latest').create();
+
 module.exports = {
   plugins: [
     "gatsby-plugin-react-helmet",
