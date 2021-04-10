@@ -3,6 +3,8 @@ import '../assets/css/comment.css';
 import React from 'react'
 
 let localHoust ="";
+let comments = {};
+
 
 const submitForm = ((ev, strapiId) => {
  localHoust =  window.location.protocol + "//" + window.location.host;
@@ -30,8 +32,14 @@ const submitForm = ((ev, strapiId) => {
 }).then(() => window.location.reload())});
 
 
-const Comments = ({ comments, article }) => {
-console.log(comments)
+const Comments = ({ article }) => {
+    fetch(
+        process.env.API_URL +
+        article.strapiId
+    )
+        .then(res => res.json())
+        .then(data => { comments = data});
+
         return (
             <div>
                 <hr />

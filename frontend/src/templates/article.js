@@ -47,14 +47,6 @@ export const query = graphql`
   }
 `;
 
-let comments = {};
-
-  fetch(
-      process.env.API_URL +
-      article.strapiId
-  )
-      .then(res => res.json())
-      .then(data => { comments = data});
 
 const Article = ({ data }) => {
   const article = data.strapiArticle;
@@ -64,10 +56,8 @@ const Article = ({ data }) => {
     shareImage: article.image,
     article: true,
   };
-  // A utiliser si fetch par graphql souhaité, mais demande rebuild gatsby
+  // A utiliser si fetch par graphql souhaité, mais cela demande rebuild gatsby
   //const comments = data.allStrapiComments.nodes;
-
-
 
 
   return (
