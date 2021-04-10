@@ -3,7 +3,7 @@ import '../assets/css/comment.css';
 import React from 'react'
 
 let localHoust ="";
-let comments = {};
+
 
 
 const submitForm = ((ev, strapiId) => {
@@ -33,6 +33,7 @@ const submitForm = ((ev, strapiId) => {
 
 
 const Comments = ({ article }) => {
+    let comments = {};
     fetch(
         process.env.API_URL +
         article.strapiId
