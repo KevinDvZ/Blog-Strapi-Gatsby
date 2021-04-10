@@ -47,13 +47,14 @@ export const query = graphql`
   }
 `;
 
-const getTheCommentaires = () => {
+let comments = {};
+
   fetch(
       process.env.API_URL +
       article.strapiId
   )
       .then(res => res.json())
-      .then(data => { return data})};
+      .then(data => { comments = data});
 
 const Article = ({ data }) => {
   const article = data.strapiArticle;
@@ -67,7 +68,7 @@ const Article = ({ data }) => {
   //const comments = data.allStrapiComments.nodes;
 
 
-    const comments = getTheCommentaires();
+
 
   return (
     <Layout seo={seo}>
