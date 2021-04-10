@@ -2,6 +2,13 @@
 import '../assets/css/comment.css';
 import React from 'react'
 
+let comments = [];
+fetch(
+    process.env.API_URL + "/comments?article=" +
+    article.strapiId
+)
+    .then(res => res.json())
+    .then(data => { comments = data});
 
 const submitForm = ((ev, strapiId) => {
  ev.preventDefault();
@@ -29,13 +36,6 @@ const submitForm = ((ev, strapiId) => {
 
 
 const Comments = ({ article }) => {
-    let comments = [];
-    fetch(
-        process.env.API_URL + "/comments?article=" +
-        article.strapiId
-    )
-        .then(res => res.json())
-        .then(data => { comments = data});
 
         return (
             <div>
