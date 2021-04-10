@@ -47,6 +47,14 @@ export const query = graphql`
   }
 `;
 
+const getTheCommentaires = () => {
+  fetch(
+      process.env.API_URL +
+      article.strapiId
+  )
+      .then(res => res.json())
+      .then(data => { return data})};
+
 const Article = ({ data }) => {
   const article = data.strapiArticle;
   const seo = {
@@ -55,9 +63,11 @@ const Article = ({ data }) => {
     shareImage: article.image,
     article: true,
   };
-  const comments = data.allStrapiComments.nodes;
+  // A utiliser si fetch par graphql souhaité, mais demande rebuild gatsby
+  //const comments = data.allStrapiComments.nodes;
 
 
+    const comments = getTheCommentaires();
 
   return (
     <Layout seo={seo}>
