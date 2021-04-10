@@ -2,12 +2,8 @@
 import '../assets/css/comment.css';
 import React from 'react'
 
-let localHoust ="";
-
-
 
 const submitForm = ((ev, strapiId) => {
- localHoust =  window.location.protocol + "//" + window.location.host;
  ev.preventDefault();
  fetch(`${process.env.GATSBY_API_URL}`, {
         method: 'post',
@@ -32,8 +28,8 @@ const submitForm = ((ev, strapiId) => {
 }).then(() => window.location.reload())});
 
 
-const Comments = ({ article }) => {
-    let comments = {};
+const Comments = ({ comments, article }) => {
+    comments = {};
     fetch(
         process.env.API_URL +
         article.strapiId
