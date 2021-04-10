@@ -34,16 +34,7 @@ export const query = graphql`
         }
       }       
     }
-     allStrapiComments(filter: {article: {slug: { eq: $slug }}}) {
-    nodes {
-      email
-      message
-      author
-      created_at(formatString: "DD MMMM YYYY à HH:MM", locale: "FR")
-      strapiId
-    }
-  }
-
+     
   }
 `;
 
@@ -56,9 +47,19 @@ const Article = ({ data }) => {
     shareImage: article.image,
     article: true,
   };
-  // A utiliser si fetch par graphql souhaité, mais cela demande rebuild gatsby
+  // A utiliser si fetch par graphql souhaité, mais cela demande rebuild gatsby et ajouter commande graphql
   //const comments = data.allStrapiComments.nodes;
-
+  /*
+  allStrapiComments(filter: {article: {slug: { eq: $slug }}}) {
+    nodes {
+      email
+      message
+      author
+      created_at(formatString: "DD MMMM YYYY à HH:MM", locale: "FR")
+      strapiId
+    }
+  }
+   */
 
   return (
     <Layout seo={seo}>
