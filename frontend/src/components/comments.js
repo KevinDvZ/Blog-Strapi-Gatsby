@@ -1,7 +1,7 @@
 
 import '../assets/css/comment.css';
 import React from 'react'
-import 'whatwg-fetch';
+import {fetch as fetchPolyfill} from 'whatwg-fetch';
 
 let comments = [];
 const apiUrl = process.env.API_URL;
@@ -33,7 +33,7 @@ const submitForm = ((ev, strapiId) => {
 
 const Comments = ({ article }) => {
 
-    window.fetch(
+    fetchPolyfill(
          apiUrl + "/comments?article=" +
         article.strapiId
     )
