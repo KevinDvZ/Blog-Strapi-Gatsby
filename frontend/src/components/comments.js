@@ -1,7 +1,7 @@
 
 import '../assets/css/comment.css';
 import React from 'react'
-
+const fetch = require("node-fetch");
 
 let comments = [];
 const apiUrl = process.env.API_URL;
@@ -33,7 +33,7 @@ const submitForm = ((ev, strapiId) => {
 
 
 const Comments = ({ article }) => {
-    const fetch = require("node-fetch");
+
     fetch(
          apiUrl + "/comments?article=" +
         article.strapiId
