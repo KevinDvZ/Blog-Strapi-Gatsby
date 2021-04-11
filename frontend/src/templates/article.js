@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import { graphql } from "gatsby";
-import Img from "gatsby-image";
+// import Img from "gatsby-image"
+import { GatsbyImage } from "gatsby-plugin-image"
 import Moment from "react-moment";
 import Layout from "../components/layout";
 import Markdown from "react-markdown";
@@ -18,19 +19,15 @@ export const query = graphql`
       image {
         publicURL
         childImageSharp {
-          fixed {
-            src
-          }
-        }
+        gatsbyImageData(layout: FIXED)
+                }
       }
       author {
         name
         picture {
           childImageSharp {
-            fixed(width: 30, height: 30) {
-              src
-            }
-          }
+        gatsbyImageData(layout: FIXED)
+                  }
         }
       }       
     }
@@ -50,6 +47,7 @@ const Article = ({ data }) => {
   };
   // A utiliser si fetch par graphql souhaité, mais cela demande rebuild gatsby et ajouter commande graphql
   //const comments = data.allStrapiComments.nodes;
+  // commande graph ql :
   /*
   allStrapiComments(filter: {article: {slug: { eq: $slug }}}) {
     nodes {
@@ -72,7 +70,6 @@ const Article = ({ data }) => {
     )
         .then(res => res.json())
         .then(data => {
-          console.log(data)
           setComments(data);
         })
   }, [data.strapiArticle.strapiId])
@@ -99,8 +96,8 @@ const Article = ({ data }) => {
             <div className="uk-grid-small uk-flex-left" data-uk-grid="true">
               <div>
                 {article.author.picture && (
-                  <Img
-                    fixed={article.author.picture.childImageSharp.fixed}
+                  <GatsbyImage
+                    fixed={article.author.picture.childImageSharp.gatsbyImageData}
                     imgStyle={{ position: "static", borderRadius: "50%" }}
                   />
                 )}
