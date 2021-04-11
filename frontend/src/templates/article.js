@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { graphql } from "gatsby";
 import Img from "gatsby-image";
 import Moment from "react-moment";
@@ -39,6 +39,7 @@ export const query = graphql`
 `;
 
 
+
 const Article = ({ data }) => {
   const article = data.strapiArticle;
   const seo = {
@@ -60,6 +61,21 @@ const Article = ({ data }) => {
     }
   }
    */
+
+  // Rendu côté client
+  const [comments, setComments] = useState(0)
+  useEffect(() => {
+    // fetch depuis strapi
+    fetch(
+        process.env.GATSBY_API_URL + "/comments?article=" +
+        data.strapiArticle.strapiId
+    )
+        .then(res => res.json())
+        .then(data => {
+          console.log(data)
+          setComments(data);
+        })
+  }, [data.strapiArticle.strapiId])
 
   return (
     <Layout seo={seo}>
@@ -101,7 +117,7 @@ const Article = ({ data }) => {
           </div>
           <div className="comment-section">
             <h4 className="comment-header">Commentaires</h4>
-            <Comments article={article}/>
+            <Comments comments={comments} article={article}/>
           </div>
         </div>
       </div>

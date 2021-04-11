@@ -1,46 +1,36 @@
 
 import '../assets/css/comment.css';
 import React from 'react'
-import {fetch as fetchPolyfill} from 'whatwg-fetch';
-
-let comments = [];
-const apiUrl = process.env.API_URL;
 
 
 const submitForm = ((ev, strapiId) => {
  ev.preventDefault();
- fetch(`${process.env.GATSBY_API_URL}`, {
-        method: 'post',
-        headers: {
+ window.fetch(`${process.env.GATSBY_API_URL}/graphql`, {
+     method: 'post',
+     headers: {
          Accept: 'application/json',
-        },
-        body: JSON.stringify({
-                "query": `mutation ($input: createCommentInput!){createComment(input: $input){comment{message, author, article{id}}}}`,
-                "variables": {
-                        "input": {
-                                "data": {
-                                 "article": strapiId,
-                                 "author": ev.target.author.value,
-                                 "message": ev.target.message.value,
+         'Content-Type': 'application/json',
+     },
+     body: JSON.stringify({
+         "query": `mutation ($input: createCommentInput!){createComment(input: $input){comment{message, author, article{id}}}}`,
+         "variables": {
+             "input": {
+                 "data": {
+                     "article": strapiId,
+                     "author": ev.target.author.value,
+                     "message": ev.target.message.value,
 
 
-                                }
-                        }
-                },
-        }),
-}).then(() => window.location.reload())});
+                 }
+             }
+         },
+     }),
+ }).then(r => console.log ("REQUETE ENVOIE DU JSON >>>" + r)).then(() => window.location.reload())});
 
+//.then(() => window.location.reload())
 
-const Comments = ({ article }) => {
+let  Comments = ({ comments, article }) => {
 
-    fetchPolyfill(
-         apiUrl + "/comments?article=" +
-        article.strapiId
-    )
-        .then(res => res.json())
-        .then(data => {
-            console.log(data)
-            comments = data});
 
         return (
             <div>
@@ -56,7 +46,7 @@ const Comments = ({ article }) => {
                                                  ))
                     ) : (
                         <h5 className="no-comments-alert">
-                            No comments on this post yet. Be the first!
+                            Soyez le premier à poster un commentaire !
                         </h5>
                     )}
                 </div>
