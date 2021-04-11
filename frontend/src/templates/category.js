@@ -17,18 +17,15 @@ export const query = graphql`
           }
           image {
             childImageSharp {
-              fixed(width: 660) {
-                src
-              }
+                  gatsbyImageData(layout: FIXED)
+
             }
           }
           author {
             name
             picture {
               childImageSharp {
-                fixed(width: 30, height: 30) {
-                  ...GatsbyImageSharpFixed
-                }
+                  gatsbyImageData(layout: FIXED)
               }
             }
           }
