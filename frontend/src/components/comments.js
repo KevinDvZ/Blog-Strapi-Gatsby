@@ -2,36 +2,37 @@
 import '../assets/css/comment.css';
 import React from 'react'
 
+let localHoust ="";
 
 const submitForm = ((ev, strapiId) => {
+ localHoust =  window.location.protocol + "//" + window.location.host;
  ev.preventDefault();
- window.fetch(`${process.env.GATSBY_API_URL}/graphql`, {
-     method: 'post',
-     headers: {
+ fetch(`${process.env.GATSBY_API_URL}`, {
+        method: 'post',
+        headers: {
          Accept: 'application/json',
-         'Content-Type': 'application/json',
-     },
-     body: JSON.stringify({
-         "query": `mutation ($input: createCommentInput!){createComment(input: $input){comment{message, author, article{id}}}}`,
-         "variables": {
-             "input": {
-                 "data": {
-                     "article": strapiId,
-                     "author": ev.target.author.value,
-                     "message": ev.target.message.value,
+         'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+                "query": `mutation ($input: createCommentInput!){createComment(input: $input){comment{message, author, article{id}}}}`,
+                "variables": {
+                        "input": {
+                                "data": {
+                                 "article": strapiId,
+                                 "author": ev.target.author.value,
+                                 "message": ev.target.message.value,
 
 
-                 }
-             }
-         },
-     }),
- }).then(r => console.log ("REQUETE ENVOIE DU JSON >>>" + r)).then(() => window.location.reload())});
-
-//.then(() => window.location.reload())
-
-let  Comments = ({ comments, article }) => {
+                                }
+                        }
+                },
+        }),
+}).then((res) => fetch(`${localHoust}/__refresh`, {method:'POST'})).then(() =>
+console.log(localHoust))})
 
 
+const Comments = ({ comments, article }) => {
+console.log(comments)
         return (
             <div>
                 <hr />
@@ -46,7 +47,7 @@ let  Comments = ({ comments, article }) => {
                                                  ))
                     ) : (
                         <h5 className="no-comments-alert">
-                            Soyez le premier à poster un commentaire !
+                            No comments on this post yet. Be the first!
                         </h5>
                     )}
                 </div>

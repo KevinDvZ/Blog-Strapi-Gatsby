@@ -1,5 +1,8 @@
 # Tuto pour repoduire ce blog Strapi / Gatsby
 
+Lien du rendu final : https://blog-strapi-gatsby-kevindvz.vercel.app/
+
+##Disclaimer
 *Ne pas hésiter à visiter pour des infos plus précises sur la mise en place:* `https://jamstatic.fr/2018/04/26/construire-un-blog-statique-avec-gatsby-et-strapi/`
 
 ***Nous passerons en revues le tuto de cette page `https://strapi.io/blog/build-a-static-blog-with-gatsby-and-strapi`, avec les correctifs du tuto en plus (merci aux feedback des simploniens), puis selon les exigences d'un exercice dans le cadre de ma formation, je vous proposerai mon interprétation du développement de la partie des commentaires des articles***
@@ -40,7 +43,8 @@ Fermer le ficher en enregistrant. Le fichier .env est maintenant à côté du do
 13. Faire la commande `yarn add gatsby-source-strapi`, laisser mouliner
 14. Entrer dans le dossier front-end, éditer le fichier gatsy-config.js. Remplacer le contenu de ce fichier par ce texte.
 
-```require("dotenv").config({
+```
+require("dotenv").config({
   path: `.env`,
 });
 
@@ -1004,208 +1008,60 @@ Allons maintenant faire les modifs nécessaires en front end.
 
 #Front-end : Gatsby
 
-**(attention, dans mon cas j'ai nommé dans le Backend ma classe "Comments", au pluriel. Faites attention à faire correspondre les codes suivant avec votre projet en corrigeant l'erreur. )**
+**(attention, dans mon cas j'ai nommé ma classe "Comments", au pluriel. Faites attention à faire correspondre les codes suivant avec votre projet en corrigeant l'erreur. )**
 
 
 ##La liste des commentaires doit s'afficher dans les articles. 
+###Disclaimer :
+*Cette partie est le fruit d'une recherche chaotique, et je ne peux garantir que tout soit stable. Ainsi, il faut être vigilant à plusieurs chose :*
+1. l'orhtographe des variables, attention pour moi ``Comments`` est au pluriel.
+2. les variables d'environnement : Il est important d'utiliser le préfixe GATSBY *exemple: GATSBY_API_URL* et non *API_URL*. Ne pas hésiter à la renommer dans votre fichier .env et dans tout le projet.
+3. le point le plus outrageant : les mises à jour innatendue de gatsby, qui utilise certaines dépendances parfois totalement différente. *exemple: Gatsby_Image* (cf : https://discord.com/channels/@me/761576309532786728/831160056421810266 )
 
-On va devoir modifier le modèle des articles. J'ai décidé donc de passer par GraphQL, qui sous-tend le focntionnement de Gatsby, en utilisant le "slug" de chaque article ( extension de lien url de chaque article).
-Il faut savoir que chaque commande que j'ai utilisé ont été généré par GraphIql, l'interface de génération de requetes de Gatsby. Avant de pourvoir y accéder, il faut inclure les "commentaires" au moment de la compilation de Gatsby.
+### Création de l'espace commentaire 
+~~On va devoir modifier le modèle des articles. J'ai décidé donc de passer par GraphQL, qui sous-tend le focntionnement de Gatsby, en utilisant le "slug" de chaque article ( extension de lien url de chaque article).
+Il faut savoir que chaque commande que j'ai utilisé ont été généré par GraphIql, l'interface de génération de requetes de Gatsby. Avant de pourvoir y accéder, il faut inclure les "commentaires" au moment de la compilation de Gatsby.~~
 
-1. Dans `gatsby-node.js`, rajouter dans la liste des requetes GrahQl :
-   ```
-   comments: allStrapiComments {
-   edges {
-   node {
-   strapiId
-   }
-   }
-   }
-   ```
-   
-Voici mon fichier entier gatsby-node.js entier si jamais vous avez des erreurs innoportunes :
+**Faux : on ne peux pas se servir de la requete graphql pour mettre a jour dynamiquement Gatsby. Vercel ne prends pas en compte le hook refresh.
+Solution : faire un fetch qui est appelé a chaque état de React.**
 
-```
-exports.createPages = async ({ graphql, actions }) => {
-  const { createPage } = actions;
-  const result = await graphql(
-    `
-      {
-        articles: allStrapiArticle {
-          edges {
-            node {
-              strapiId
-              slug
-            }
-          }
-        }
-        categories: allStrapiCategory {
-          edges {
-            node {
-              strapiId
-              slug
-            }
-          }
-        }
-        comments: allStrapiComments {
-          edges {
-            node {
-              strapiId
-            }
-          }
-        }
-      }
-    `
-  );
-
-  if (result.errors) {
-    throw result.errors;
-  }
-
-  // Create blog articles pages.
-  const articles = result.data.articles.edges;
-  const categories = result.data.categories.edges;
-
-  const ArticleTemplate = require.resolve("./src/templates/article.js");
-
-  articles.forEach((article, index) => {
-    createPage({
-      path: `/article/${article.node.slug}`,
-      component: ArticleTemplate,
-      context: {
-        slug: article.node.slug,
-      },
-    });
-  });
-
-  const CategoryTemplate = require.resolve("./src/templates/category.js");
-
-  categories.forEach((category, index) => {
-    createPage({
-      path: `/category/${category.node.slug}`,
-      component: CategoryTemplate,
-      context: {
-        slug: category.node.slug,
-      },
-    });
-  });
-};
-
-module.exports.onCreateNode = async ({ node, actions, createNodeId }) => {
-  const crypto = require(`crypto`);
-
-  if (node.internal.type === "StrapiArticle") {
-    const newNode = {
-      id: createNodeId(`StrapiArticleContent-${node.id}`),
-      parent: node.id,
-      children: [],
-      internal: {
-        content: node.content || " ",
-        type: "StrapiArticleContent",
-        mediaType: "text/markdown",
-        contentDigest: crypto
-          .createHash("md5")
-          .update(node.content || " ")
-          .digest("hex"),
-      },
-    };
-    actions.createNode(newNode);
-    actions.createParentChildLink({
-      parent: node,
-      child: newNode,
-    });
-  }
-};
+1. Créer un fichier comments.js dans le dossier components/, y copier-coller ce code :
 ```
 
-2. Dans le fichier `gatsby-config.js`, rajouter dans le groupement `  resolve: "gatsby-source-strapi",`, dans le tableau `contentTypes:` (ligne 19 dans mon cas), l'élément "comments". Ce qui devrait donner :
-   ```
-       {
-      resolve: "gatsby-source-strapi",
-      options: {
-        apiURL: process.env.API_URL || "http://localhost:1337",
-        contentTypes: ["article", "category", "writer","comments"],
-        singleTypes: [`homepage`, `global`],
-        queryLimit: 1000,
-      },
-    },
-   
-   ```
-
-3. Sauvegarder, le front-end va surement redémarrer. 
-
-4. Vous pouvez maintenant accéder depuis le front-end à l'adresse GraphiQL :
-
-```
-http://localhost:8000/___graphql
-```
-
-C'est en cumulant les bons paramètres et en expérimantant les résultats que j'ai pu trouver cette commande graphql qui récupère la liste des commentaires pour chaque article :
-
-```
-     allStrapiComments(filter: {article: {slug: { eq: $slug }, status: { eq: "published" }}}) {
-    nodes {
-      email
-      message
-      author
-      created_at(formatString: "DD MMMM YYYY à HH:MM", locale: "FR")
-      strapiId
-    }
-  }
-```
-
-5. Copier coller cette requete à la suite des requetes graphQL de `templates/article.js`. Ce qui devrait donner pour la requete entière :
-
-```
-
-export const query = graphql`
-  query ArticleQuery($slug: String!) {
-    strapiArticle(slug: { eq: $slug }, status: { eq: "published" }) {
-      strapiId
-      title
-      description
-      content
-      publishedAt
-      image {
-        publicURL
-        childImageSharp {
-          fixed {
-            src
-          }
-        }
-      }
-      author {
-        name
-        picture {
-          childImageSharp {
-            fixed(width: 30, height: 30) {
-              src
-            }
-          }
-        }
-      }       
-    }
-     allStrapiComments(filter: {article: {slug: { eq: $slug }, status: { eq: "published" }}}) {
-    nodes {
-      email
-      message
-      author
-      created_at(formatString: "DD MMMM YYYY à HH:MM", locale: "FR")
-      strapiId
-    }
-  }
-
-  }
-`;
-```
-
-6. Créer un fichier comments.js dans le dossier components/, y copier-coller ce code :
-```
-import React from 'react';
 import '../assets/css/comment.css';
+import React from 'react'
 
-const Comments = ({ comments }) => {
-        console.log(comments)
+let localHoust ="";
+
+const submitForm = ((ev, strapiId) => {
+ localHoust =  window.location.protocol + "//" + window.location.host;
+ ev.preventDefault();
+ fetch(`${process.env.GATSBY_API_URL}`, {
+        method: 'post',
+        headers: {
+         Accept: 'application/json',
+         'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+                "query": `mutation ($input: createCommentInput!){createComment(input: $input){comment{message, author, article{id}}}}`,
+                "variables": {
+                        "input": {
+                                "data": {
+                                 "article": strapiId,
+                                 "author": ev.target.author.value,
+                                 "message": ev.target.message.value,
+
+
+                                }
+                        }
+                },
+        }),
+}).then((res) => fetch(`${localHoust}/__refresh`, {method:'POST'})).then(() =>
+console.log(localHoust))})
+
+
+const Comments = ({ comments, article }) => {
+console.log(comments)
         return (
             <div>
                 <hr />
@@ -1224,6 +1080,25 @@ const Comments = ({ comments }) => {
                         </h5>
                     )}
                 </div>
+
+                    <form className="comment-form" onSubmit={ev => submitForm(ev, article.strapiId)}>
+                            <h4 className="comment-post">Laissez un commentaire</h4>
+                            <input
+                             type="text"
+                             placeholder="Votre pseudo/nom"
+                             name="author"
+                            />
+                            <textarea
+                             type="text"
+                             placeholder="Votre commentaire"
+                             rows="4"
+                             name="message"
+                            />
+                            <div>
+                                    <button className="button submit-button" type="submit">Envoyer</button>
+                            </div>
+                    </form>
+
             </div>
         );
 };
@@ -1315,40 +1190,44 @@ hr {
 
 ```
 
+
+8. Dans le fichier `templates/article.js`, remplacer tout les imports par :
+
+```
+import React, {useEffect, useState} from "react";
+import { graphql } from "gatsby";
+// import Img from "gatsby-image"
+import { GatsbyImage } from "gatsby-plugin-image"
+import Moment from "react-moment";
+import Layout from "../components/layout";
+import Markdown from "react-markdown";
+import Comments from '../components/comments';
+```
+
 8. Dans le fichier `templates/article.js`, rajouter la déclaration des commentaires quelque-part dans votre template (pour ma part ligne 98), en collant le code suivant
 
 ```
           <div className="comment-section">
             <h4 className="comment-header">Commentaires</h4>
-            <Comments comments={comments}/>
+            <Comments comments={comments} article={article}/>
           </div>
 ```
 
+9. Dans le fichier template ``article.js``, copier coller ce code avant le **return** :
+```
+// Rendu côté client
+  const [comments, setComments] = useState(0)
+  useEffect(() => {
+    // fetch depuis strapi
+    fetch(
+        process.env.GATSBY_API_URL + "/comments?article=" +
+        data.strapiArticle.strapiId
+    )
+        .then(res => res.json())
+        .then(data => {
+          setComments(data);
+        })
+  }, [data.strapiArticle.strapiId])
+```
 9. Enregistrer / redémarrer. Si tout se passe bien, la liste des commentaires pour chaque article devrait s'afficher. Libre à vous de modifier son css.
 
-## Un visiteur doit pouvoir poster un commentaire : 
-
-1. Rajouter le formulaire dans `template/article.js`, juste après la liste des commentaires. 
-```
-<form className="comment-form">
-            <h4 className="comment-post">Laissez un commentaire</h4>
-            <input
-             placeholder="Votre pseudo/nom"
-             value={submit.name}
-             name="name"
-             onChange={submit.handleChange}
-            />
-            <textarea
-             placeholder="Votre commentaire"
-             rows="4"
-             name="comment"
-             value={submit.comment}
-             onChange={submit.handleChange}
-            />
-            <div>
-              <button className="button submit-button">Envoyer</button>
-            </div>
-          </form>
-```
-
-Redémarrer, vous devriez voir le formulaire.
