@@ -1008,15 +1008,12 @@ Allons maintenant faire les modifs nécessaires en front end.
 
 # Front-end : Gatsby
 
-**(attention, dans mon cas j'ai nommé ma classe "Comments", au pluriel. Faites attention à faire correspondre les codes suivant avec votre projet en corrigeant l'erreur. )**
-
-
 ## La liste des commentaires doit s'afficher dans les articles. 
 ### Disclaimer :
 *Cette partie est le fruit d'une recherche chaotique, et je ne peux garantir que tout soit stable. Ainsi, il faut être vigilant à plusieurs chose :*
-1. l'orhtographe des variables, attention pour moi ``Comments`` est au pluriel.
+1. l'orthographe des variables & composants : attention pour moi ``Comments`` est au pluriel.
 2. les variables d'environnement : Il est important d'utiliser le préfixe GATSBY *exemple: GATSBY_API_URL* et non *API_URL*. Ne pas hésiter à la renommer dans votre fichier .env et dans tout le projet.
-3. le point le plus outrageant : les mises à jour innatendue de gatsby, qui utilise certaines dépendances parfois totalement différente. *exemple: Gatsby_Image* (cf : https://discord.com/channels/@me/761576309532786728/831160056421810266 )
+3. le point le plus rageant : les mises à jour innatendues de gatsby, qui peut changer certaines dépendances parfois totalement différente. *exemple: Gatsby_Image* (cf : https://www.gatsbyjs.com/docs/reference/release-notes/image-migration-guide/ )
 
 ### Création de l'espace commentaire 
 ~~On va devoir modifier le modèle des articles. J'ai décidé donc de passer par GraphQL, qui sous-tend le focntionnement de Gatsby, en utilisant le "slug" de chaque article ( extension de lien url de chaque article).
