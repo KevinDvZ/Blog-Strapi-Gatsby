@@ -7,7 +7,7 @@ let localHoust ="";
 const submitForm = ((ev, strapiId) => {
  localHoust =  window.location.protocol + "//" + window.location.host;
  ev.preventDefault();
- fetch(`${process.env.GATSBY_API_URL}`, {
+ fetch(`${process.env.GATSBY_API_URL_POST}`, {
         method: 'post',
         headers: {
          Accept: 'application/json',
