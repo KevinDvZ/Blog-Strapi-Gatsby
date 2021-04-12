@@ -1006,13 +1006,13 @@ Vous pouvez tester dans Postman au endoint localhost:1337/comment voir si le jso
 
 Allons maintenant faire les modifs nécessaires en front end.
 
-#Front-end : Gatsby
+# Front-end : Gatsby
 
 **(attention, dans mon cas j'ai nommé ma classe "Comments", au pluriel. Faites attention à faire correspondre les codes suivant avec votre projet en corrigeant l'erreur. )**
 
 
-##La liste des commentaires doit s'afficher dans les articles. 
-###Disclaimer :
+## La liste des commentaires doit s'afficher dans les articles. 
+### Disclaimer :
 *Cette partie est le fruit d'une recherche chaotique, et je ne peux garantir que tout soit stable. Ainsi, il faut être vigilant à plusieurs chose :*
 1. l'orhtographe des variables, attention pour moi ``Comments`` est au pluriel.
 2. les variables d'environnement : Il est important d'utiliser le préfixe GATSBY *exemple: GATSBY_API_URL* et non *API_URL*. Ne pas hésiter à la renommer dans votre fichier .env et dans tout le projet.
